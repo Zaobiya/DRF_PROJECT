@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 # @api_view(['GET', 'POST'])                                                 
 # def movie_list(request):
 #     if request.method == 'GET':
-class MovieListAV(APIView)                                                
+class MovieListAV(APIView):                                               
 
     def get(self, request):
         movies = Movie.objects.all()
@@ -35,13 +35,13 @@ class MovieListAV(APIView)
 
 # @api_view(['GET', 'PUT', 'DELETE'])        #calling this function as get method                                         
 # def movie_details(request, pk):
+
 class MovieDetailAV(APIView):
     def get(self, request, pk):
         try:
             movie = Movie.objects.get(pk=pk)
         except Movie.DoesNotExist:
-            return Response({'error': 'Movie not found'},
-                            status = status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Movie not found'},status = status.HTTP_404_NOT_FOUND)
 
         serializer = MovieSerializer(movie)
         return Response(serializer.data)
@@ -53,8 +53,7 @@ class MovieDetailAV(APIView):
             serializer.save()
             return Response(serializer.data)
         else:
-            return Response(serializer.errors,
-                            status = status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         movie = Movie.objects.get(pk=pk)
