@@ -1,22 +1,27 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+# from rest_framework.decorators import api_view
 from myappone.models import Movie
 from myappone.api.serializers import MovieSerializer
 from rest_framework import status
+from rest_framework.views import APIView
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # by default: set for 'GET' request
 # 'many=True' is used because of extracting more than one object
+#Class based views
 
-@api_view(['GET', 'POST'])                                                 
-def movie_list(request):
-    if request.method == 'GET':
+# @api_view(['GET', 'POST'])                                                 
+# def movie_list(request):
+#     if request.method == 'GET':
+class MovieListAV(APIView)                                                
+
+    def get(self, request):
         movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)         
         return Response(serializer.data)
 
-    if request.method == 'POST':
+    def post(self, request):
         serializer = MovieSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -26,11 +31,12 @@ def movie_list(request):
 
 # ---------------------------------------------------------------------------------------------------------------------
 # by default: set for 'GET' request
+#class based views : detail of each movie
 
-@api_view(['GET', 'PUT', 'DELETE'])        #calling this function as get method                                         
-def movie_details(request, pk):
-
-    if request.method == 'GET':
+# @api_view(['GET', 'PUT', 'DELETE'])        #calling this function as get method                                         
+# def movie_details(request, pk):
+class MovieDetailAV(APIView):
+    def get(self, request, pk):
         try:
             movie = Movie.objects.get(pk=pk)
         except Movie.DoesNotExist:
@@ -40,7 +46,7 @@ def movie_details(request, pk):
         serializer = MovieSerializer(movie)
         return Response(serializer.data)
 
-    if request.method == 'PUT':
+    def put(self, request, pk):
         movie = Movie.objects.get(pk=pk)
         serializer = MovieSerializer(movie, data=request.data)
         if serializer.is_valid():
@@ -50,7 +56,7 @@ def movie_details(request, pk):
             return Response(serializer.errors,
                             status = status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'DELETE':
+    def delete(self, request, pk):
         movie = Movie.objects.get(pk=pk)
         movie.delete
         return Response(status=status.HTTP_204_NO_CONTENT)
